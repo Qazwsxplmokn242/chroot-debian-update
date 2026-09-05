@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: debian update
+    - name: CHROOT INSTALL DEBIAN
       shell: bash
       run: |
        CROSS_ROOT="/mnt/chroot-debian"
@@ -30,10 +30,10 @@ jobs:
 
        sudo chroot $CROSS_ROOT /bin/bash
 
-    - name: debian adduser passwork-not
+    - name: debian apt-gat
       shell: bash
       run: |
        CROSS_ROOT="/mnt/chroot-debian"
 
        sudo chroot $CROSS_ROOT /bin/bash -c "
-        apt-get update -y"
+        apt-get update && apt-get install strongswan strongswan-pki -y"
