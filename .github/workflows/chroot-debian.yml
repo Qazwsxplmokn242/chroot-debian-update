@@ -12,13 +12,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: 设置交叉编译环境
+    - name: debian update
       shell: bash
       run: |
        CROSS_ROOT="/mnt/chroot-debian"
        CROSS_MIRROR="http://deb.debian.org/debian/"
        
-       sudo apt-get -y install debootstrap qemu-user-static binfmt-support
+       sudo apt-get -y install debootstrap -y
 
        sudo mkdir -p $CROSS_ROOT
        sudo debootstrap --arch=amd64 stable $CROSS_ROOT $CROSS_MIRROR
