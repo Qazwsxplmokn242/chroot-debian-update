@@ -22,9 +22,10 @@ jobs:
 
        sudo mkdir -p $CROSS_ROOT
        sudo debootstrap --arch=amd64 stable $CROSS_ROOT $CROSS_MIRROR
-       sudo mount -t proc /proc /srv/chroot/debian-stable/proc
-       sudo mount -t sysfs /sys /srv/chroot/debian-stable/sys
-       sudo mount --bind /dev /srv/chroot/debian-stable/dev
-       sudo mount --bind /dev/pts /srv/chroot/debian-stable/dev/pts
+       
+       sudo mount -t proc /proc /mnt/chroot-debian/proc
+       sudo mount -t sysfs /sys /mnt/chroot-debian/sys
+       sudo mount --bind /dev /mnt/chroot-debian/dev
+       sudo mount --bind /dev/pts /mnt/chroot-debian/dev/pts
 
-       sudo chroot /srv/chroot/debian-stable /bin/bash
+       sudo chroot /mnt/chroot-debian /bin/bash
