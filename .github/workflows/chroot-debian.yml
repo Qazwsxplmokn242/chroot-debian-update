@@ -35,7 +35,7 @@ jobs:
       run: |
        CROSS_ROOT="/mnt/chroot-debian"
        
-       sudo chroot $CROSS_ROOT /bin/bash -c "apt update && apt install adduers -y"
+       sudo chroot $CROSS_ROOT /bin/bash -c "apt update -y"
        sudo chroot $CROSS_ROOT /bin/bash -c "adduser --disabled-password --gecos '' debian"
        sudo chroot $CROSS_ROOT /bin/bash -c "useradd -m -s /bin/bash debian"
       
