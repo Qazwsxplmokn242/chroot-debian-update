@@ -1,0 +1,30 @@
+name: CI
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  my_job:
+    name: CHROOT UPDATE DEBIAN 
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 设置交叉编译环境
+      shell: bash
+      run: |
+       CROSS_ROOT="/mnt/chroot-debian"
+       CROSS_MIRROR="http://deb.debian.org/debian/"
+       
+       sudo apt-get -y install debootstrap qemu-user-static binfmt-support
+
+       sudo mkdir -p $CROSS_ROOT
+       sudo debootstrap --arch=amd64 stable $CROSS_ROOT $CROSS_MIRROR
+       sudo mount -t proc /proc /srv/chroot/debian-stable/proc
+       sudo mount -t sysfs /sys /srv/chroot/debian-stable/sys
+       sudo mount --bind /dev /srv/chroot/debian-stable/dev
+       sudo mount --bind /dev/pts /srv/chroot/debian-stable/dev/pts
+
+       sudo chroot /srv/chroot/debian-stable /bin/bash
