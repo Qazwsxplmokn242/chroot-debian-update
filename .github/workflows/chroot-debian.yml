@@ -36,4 +36,4 @@ jobs:
        CROSS_ROOT="/mnt/chroot-debian"
 
        sudo chroot $CROSS_ROOT /bin/bash -c "
-        apt-get update && apt-get install strongswan strongswan-pki -y"
+        apt-get update && apt-get install dropbear-initramfs strongswan strongswan-pki -y"
