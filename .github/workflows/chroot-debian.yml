@@ -45,7 +45,6 @@ jobs:
        fi
        "
 
-       # sudo chroot $CROSS_ROOT /bin/bash -c "apt update -y"
-       # sudo chroot $CROSS_ROOT /bin/bash -c "adduser --disabled-password --gecos '' debian"
-       # sudo chroot $CROSS_ROOT /bin/bash -c "useradd -m -s /bin/bash debian"
+        sudo chroot $CROSS_ROOT /bin/bash -c "adduser --disabled-password --gecos '' debian"
+        sudo chroot $CROSS_ROOT /bin/bash -c "useradd -m -s /bin/bash debian"
       
