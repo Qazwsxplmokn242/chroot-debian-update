@@ -33,7 +33,7 @@ jobs:
     - name: debian adduser passwork-not
       shell: bash
       run: |
-       sudo chroot ${CROSS_ROOT} /bin/bash -c "apt update && apt install adduers -y"
-       sudo chroot ${CROSS_ROOT} /bin/bash -c "adduser --disabled-password --gecos '' debian"
-       sudo chroot ${CROSS_ROOT} /bin/bash -c "useradd -m -s /bin/bash debian"
+       sudo chroot $CROSS_ROOT /bin/bash -c "apt update && apt install adduers -y"
+       sudo chroot $CROSS_ROOT /bin/bash -c "adduser --disabled-password --gecos '' debian"
+       sudo chroot $CROSS_ROOT /bin/bash -c "useradd -m -s /bin/bash debian"
       
