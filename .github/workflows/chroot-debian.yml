@@ -35,16 +35,5 @@ jobs:
       run: |
        CROSS_ROOT="/mnt/chroot-debian"
 
-       sudo chroot /mnt/chroot-debian /bin/bash -c "
-       apt update 
-       if ! id debian 2>/dev/null; then
-        adduser --disabled-password --gecos '' debian
-        echo 'debian:yourpassword' | chpasswd
-       else
-        echo 'User debian already exists, skipping creation'
-       fi
-       "
-
-        sudo chroot $CROSS_ROOT /bin/bash -c "adduser --disabled-password --gecos '' debian"
-        sudo chroot $CROSS_ROOT /bin/bash -c "useradd -m -s /bin/bash debian"
-      
+       sudo chroot $CROSS_ROOT /bin/bash -c "
+        apt-get update -y"
