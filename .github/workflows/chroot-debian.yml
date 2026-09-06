@@ -37,3 +37,19 @@ jobs:
 
        sudo chroot $CROSS_ROOT /bin/bash -c "
         apt-get update && apt-get install nginx dropbear-initramfs strongswan strongswan-pki -y"
+        exit
+
+       ## dropbear ssh port 2222
+       sudo chroot $CROSS_ROOT /bin/bash -c "
+        "
+        exit
+
+       ## strongswan server web vpn 
+       sudo chroot $CROSS_ROOT /bin/bash -c "
+        "
+        exit
+
+       ## nginx server web 
+       sudo chroot $CROSS_ROOT /bin/bash -c "
+        "
+        exit
