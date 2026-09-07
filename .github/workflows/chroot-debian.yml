@@ -47,15 +47,11 @@ jobs:
        ## dropbear ssh port 2222
        echo 'NO_START=0
              DROPBEAR_PORT=2222
-             DROPBEAR_EXTRA_ARGS="-w -s"' > $CROSS_ROOT/etc/default/dropbear && cat $CROSS_ROOT/etc/default/dropbear
+             DROPBEAR_EXTRA_ARGS="-w -s"' | tee -a $CROSS_ROOT/etc/default/dropbear
 
 
        ## strongswan server web vpn 
-       sudo chroot $CROSS_ROOT /bin/bash -c "
-        "
-        exit
+       #echo '' > $CROSS_ROOT/
 
        ## nginx server web 
-       sudo chroot $CROSS_ROOT /bin/bash -c "
-        "
-        exit
+       #echo '' > $CROSS_ROOT/
