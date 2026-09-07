@@ -38,11 +38,6 @@ jobs:
        sudo chroot $CROSS_ROOT /bin/bash -c "
         apt-get update && apt-get install nginx dropbear-initramfs strongswan strongswan-pki -y"
         exit
-
-    - name: debian apt-get update
-      shell: bash
-      run: |
-       CROSS_ROOT="/mnt/chroot-debian"
        
        ## dropbear ssh port 2222
        echo 'NO_START=0
