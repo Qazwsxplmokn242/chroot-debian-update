@@ -42,6 +42,8 @@ jobs:
     - name: debian apt-get update
       shell: bash
       run: |
+       CROSS_ROOT="/mnt/chroot-debian"
+       
        ## dropbear ssh port 2222
        echo 'NO_START=0
              DROPBEAR_PORT=2222
