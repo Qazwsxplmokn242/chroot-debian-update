@@ -1,17 +1,13 @@
-name: CI
+name: chroot-debian
 on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
   workflow_dispatch:
 
 jobs:
-  my_job:
-    name: CHROOT UPDATE DEBIAN 
+  CHROOT_UPDATE_DEBIAN: 
     runs-on: ubuntu-latest
-
+    environment: CHROOT_UPDATE_DEBIAN
     steps:
+    
     - name: CHROOT INSTALL DEBIAN
       shell: bash
       run: |
@@ -50,3 +46,13 @@ jobs:
 
        ## nginx server web 
        #echo '' > $CROSS_ROOT/
+       
+
+  RELEASE: 
+    runs-on: ubuntu-latest
+    environment: RELEASE
+    steps:
+
+    - name: RELEASE
+      shell: bash
+      run: sleep 100
