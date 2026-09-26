@@ -38,6 +38,7 @@ jobs:
     - name: NANO dropbear prot 2222
       shell: bash
       run: |
+       sudo
        cat >> "$CROSS_ROOT/etc/default/dropbear" <<'EOF'
        NO_START=0
        DROPBEAR_PORT=2222
@@ -47,6 +48,7 @@ jobs:
     - name: NANO strongswan server web vpn
       shell: bash
       run: |
+       sudo
        cat > "$CROSS_ROOT/etc/ipsec.conf" <<'EOF'
        config setup
            charondebug="all"
@@ -64,6 +66,7 @@ jobs:
     - name: NANO nginx server web 
       shell: bash
       run: |
+       sudo
        ## nginx server web 
        #echo '' > $CROSS_ROOT/
        
