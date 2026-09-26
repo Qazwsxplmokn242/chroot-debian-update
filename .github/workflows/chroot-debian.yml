@@ -34,13 +34,18 @@ jobs:
        sudo chroot $CROSS_ROOT /bin/bash -c "
         apt-get update && apt-get install nginx dropbear-initramfs strongswan strongswan-pki -y"
         exit
-       
+
+    - name: NANO dropbear prot 2222
+      shell: bash
+      run: |
        ## dropbear ssh port 2222
        echo 'NO_START=0
              DROPBEAR_PORT=2222
              DROPBEAR_EXTRA_ARGS="-w -s"' | tee -a $CROSS_ROOT/etc/default/dropbear
 
-
+    - name: NANO strongswan server web vpn
+      shell: bash
+      run: |
        ## strongswan server web vpn 
        echo 'config setup
              charondebug="all"
@@ -53,6 +58,9 @@ jobs:
              rightsubnet=
              auto=start' > $CROSS_ROOT/etc/ipsec.conf
 
+    - name: NANO nginx server web 
+      shell: bash
+      run: |
        ## nginx server web 
        #echo '' > $CROSS_ROOT/
        
