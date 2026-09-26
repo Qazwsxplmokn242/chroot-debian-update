@@ -42,7 +42,16 @@ jobs:
 
 
        ## strongswan server web vpn 
-       #echo '' > $CROSS_ROOT/
+       echo 'config setup
+             charondebug="all"
+
+             conn ipsec-vnc-server
+             keyexchange=ikev2
+             left=
+             leftsubnet=
+             right=
+             rightsubnet=
+             auto=start' > $CROSS_ROOT/etc/ipsec.conf
 
        ## nginx server web 
        #echo '' > $CROSS_ROOT/
