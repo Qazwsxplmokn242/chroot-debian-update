@@ -2,80 +2,122 @@ name: chroot-debian
 on:
   workflow_dispatch:
 
+env:
+  CROSS_ROOT: /mnt/chroot-debian
+  CROSS_MIRROR: http://deb.debian.org/debian/
+
 jobs:
-  CHROOT_UPDATE_DEBIAN: 
+  CHROOT_UPDATE_DEBIAN:
     runs-on: ubuntu-latest
     environment: CHROOT_UPDATE_DEBIAN
     steps:
-    
-    - name: CHROOT INSTALL DEBIAN
+
+    - name: Install debootstrap and create Debian rootfs
       shell: bash
       run: |
-       CROSS_ROOT="/mnt/chroot-debian"
-       CROSS_MIRROR="http://deb.debian.org/debian/"
-       
-       sudo apt-get -y install debootstrap -y
+        set -euxo pipefail
+        sudo apt-get update
+        sudo apt-get install -y debootstrap
 
-       sudo mkdir -p $CROSS_ROOT
-       sudo debootstrap --arch=amd64 stable $CROSS_ROOT $CROSS_MIRROR
-       
-       sudo mount -t proc /proc $CROSS_ROOT/proc
-       sudo mount -t sysfs /sys $CROSS_ROOT/sys
-       sudo mount --bind /dev $CROSS_ROOT/dev
-       sudo mount --bind /dev/pts $CROSS_ROOT/dev/pts
+        sudo mkdir -p "$CROSS_ROOT"
+        sudo debootstrap --arch=amd64 stable "$CROSS_ROOT" "$CROSS_MIRROR"
 
-       sudo chroot $CROSS_ROOT /bin/bash
+        # DNS for the chroot
+        echo 'nameserver 1.1.1.1' | sudo tee "$CROSS_ROOT/etc/resolv.conf"
 
-    - name: debian apt-get update
+        # Mount pseudo-filesystems
+        sudo mount -t proc  /proc      "$CROSS_ROOT/proc"
+        sudo mount -t sysfs /sys       "$CROSS_ROOT/sys"
+        sudo mount --bind   /dev       "$CROSS_ROOT/dev"
+        sudo mount --bind   /dev/pts   "$CROSS_ROOT/dev/pts"
+
+    - name: apt-get update + install packages inside chroot
       shell: bash
       run: |
-       CROSS_ROOT="/mnt/chroot-debian"
+        set -euxo pipefail
+        sudo chroot "$CROSS_ROOT" /bin/bash -c "
+          export DEBIAN_FRONTEND=noninteractive
+          apt-get update
+          apt-get install -y --no-install-recommends \
+              nginx dropbear strongswan strongswan-pki
+          apt-get clean
+          rm -rf /var/lib/apt/lists/*
+        "
 
-       sudo chroot $CROSS_ROOT /bin/bash -c "
-        apt-get update && apt-get install nginx dropbear-initramfs strongswan strongswan-pki -y"
-        exit
-
-    - name: NANO dropbear prot 2222
+    - name: Configure dropbear on port 2222
       shell: bash
       run: |
-       CROSS_ROOT="/mnt/chroot-debian"
-       cat >> "$CROSS_ROOT/etc/default/dropbear" <<'EOF'
-       NO_START=0
-       DROPBEAR_PORT=2222
-       DROPBEAR_EXTRA_ARGS="-w -s"
-       EOF
+        set -euxo pipefail
+        sudo mkdir -p "$CROSS_ROOT/etc/default"
+        # NOTE: no leading whitespace inside the heredoc lines
+        sudo tee "$CROSS_ROOT/etc/default/dropbear" >/dev/null <<'EOF'
+        NO_START=0
+        DROPBEAR_PORT=2222
+        DROPBEAR_EXTRA_ARGS="-w -s"
+        EOF
 
-    - name: NANO strongswan server web vpn
+    - name: Configure strongswan
       shell: bash
       run: |
-       CROSS_ROOT="/mnt/chroot-debian"
-       cat > "$CROSS_ROOT/etc/ipsec.conf" <<'EOF'
-       config setup
-           charondebug="all"
+        set -euxo pipefail
+        sudo tee "$CROSS_ROOT/etc/ipsec.conf" >/dev/null <<'EOF'
+        config setup
+            charondebug="all"
+        
+        conn ipsec-vpn-server
+            keyexchange=ikev2
+            left=%any
+            leftid=@vpn.example.com
+            leftauth=pubkey
+            leftcert=server-cert.pem
+            leftsubnet=0.0.0.0/0
+            right=%any
+            rightauth=eap-mschapv2
+            rightsourceip=10.10.10.0/24
+            auto=add
+        EOF
 
-       conn ipsec-vnc-server
-           keyexchange=ikev2
-           left=
-           leftsubnet=
-           right=
-           rightsubnet=
-           auto=start
-       EOF
-
-
-    - name: NANO nginx server web 
+    - name: Configure nginx
       shell: bash
       run: |
-       CROSS_ROOT="/mnt/chroot-debian"
-       ## nginx server web 
-       #echo '' > $CROSS_ROOT/
-       
+        set -euxo pipefail
+        sudo mkdir -p "$CROSS_ROOT/var/www/html"
+        sudo tee "$CROSS_ROOT/var/www/html/index.html" >/dev/null <<'EOF'
+        <!doctype html>
+        <html><body><h1>NANO web VPN</h1></body></html>
+        EOF
 
-  RELEASE: 
+    - name: Unmount pseudo-filesystems
+      if: always()
+      shell: bash
+      run: |
+        set +e
+        sudo umount -lf "$CROSS_ROOT/dev/pts" 2>/dev/null
+        sudo umount -lf "$CROSS_ROOT/dev"     2>/dev/null
+        sudo umount -lf "$CROSS_ROOT/sys"     2>/dev/null
+        sudo umount -lf "$CROSS_ROOT/proc"    2>/dev/null
+
+    - name: Package rootfs
+      shell: bash
+      run: |
+        set -euxo pipefail
+        sudo tar -C "$CROSS_ROOT" -czf /tmp/chroot-debian.tar.gz .
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: chroot-debian
+        path: /tmp/chroot-debian.tar.gz
+        retention-days: 7
+
+  RELEASE:
+    needs: CHROOT_UPDATE_DEBIAN
     runs-on: ubuntu-latest
     environment: RELEASE
     steps:
-
-    - name: RELEASE
-      shell: bash
-      run: sleep 100
+    - name: Download artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: chroot-debian
+    - name: Show what we got
+      run: ls -lh
