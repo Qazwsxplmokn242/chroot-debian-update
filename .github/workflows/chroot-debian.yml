@@ -38,25 +38,28 @@ jobs:
     - name: NANO dropbear prot 2222
       shell: bash
       run: |
-       ## dropbear ssh port 2222
-       echo 'NO_START=0
-             DROPBEAR_PORT=2222
-             DROPBEAR_EXTRA_ARGS="-w -s"' | tee -a $CROSS_ROOT/etc/default/dropbear
+       cat >> "$CROSS_ROOT/etc/default/dropbear" <<'EOF'
+       NO_START=0
+       DROPBEAR_PORT=2222
+       DROPBEAR_EXTRA_ARGS="-w -s"
+       EOF
 
     - name: NANO strongswan server web vpn
       shell: bash
       run: |
-       ## strongswan server web vpn 
-       echo 'config setup
-             charondebug="all"
+       cat > "$CROSS_ROOT/etc/ipsec.conf" <<'EOF'
+       config setup
+           charondebug="all"
 
-             conn ipsec-vnc-server
-             keyexchange=ikev2
-             left=
-             leftsubnet=
-             right=
-             rightsubnet=
-             auto=start' > $CROSS_ROOT/etc/ipsec.conf
+       conn ipsec-vnc-server
+           keyexchange=ikev2
+           left=
+           leftsubnet=
+           right=
+           rightsubnet=
+           auto=start
+       EOF
+
 
     - name: NANO nginx server web 
       shell: bash
