@@ -63,18 +63,14 @@ jobs:
         sudo tee "$CROSS_ROOT/etc/ipsec.conf" >/dev/null <<'EOF'
         config setup
             charondebug="all"
-        
-        conn ipsec-vpn-server
+
+        conn ipsec-vnc-server
             keyexchange=ikev2
-            left=%any
-            leftid=@vpn.example.com
-            leftauth=pubkey
-            leftcert=server-cert.pem
-            leftsubnet=0.0.0.0/0
-            right=%any
-            rightauth=eap-mschapv2
-            rightsourceip=10.10.10.0/24
-            auto=add
+            left=
+            leftsubnet=
+            right=
+            rightsubnet=
+            auto=start
         EOF
 
     - name: Configure nginx
